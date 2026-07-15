@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.DS_Store
+server/data/
+
+# Sprites Tiny Swords: a licença proíbe redistribuição.
+# Rode tools/fetch-assets.ps1 para baixá-los após clonar.
+client/public/assets/tiny-swords/*
+!client/public/assets/tiny-swords/CREDITS.md

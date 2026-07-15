@@ -1,0 +1,228 @@
+import { useEffect, useRef, useState } from 'react';
+import type { HudSnapshot } from '../net/connection';
+import type { RivalRecord } from './profileStorage';
+
+interface BattleOverlaysProps {
+  hud: HudSnapshot;
+  muted: boolean;
+  isSpectator?: boolean;
+  rival?: RivalRecord;
+  hasReplay: boolean;
+  onWatchReplay: () => void;
+  onExit: () => void;
+}
+
+export function BattleOverlays({
+  hud, muted, isSpectator, rival, hasReplay, onWatchReplay, onExit,
+}: BattleOverlaysProps) {
+  const [fightFlash, setFightFlash] = useState(false);
+  const [overtimeBanner, setOvertimeBanner] = useState(false);
+  const [doubleElixirBanner, setDoubleElixirBanner] = useState(false);
+  const prevPhase = useRef(hud.phase);
+  const prevSudden = useRef(hud.suddenDeath);
+  const prevCount = useRef(-1);
+  const doubleElixirShown = useRef(false);
+
+  // Banner quando entra no último minuto (elixir em dobro)
+  useEffect(() => {
+    if (
+      hud.phase === 'battle' &&
+      !hud.suddenDeath &&
+      hud.timeRemaining <= 60 &&
+      hud.timeRemaining > 0 &&
+      !doubleElixirShown.current
+    ) {
+      doubleElixirShown.current = true;
+      setDoubleElixirBanner(true);
+      setTimeout(() => setDoubleElixirBanner(false), 2200);
+    }
+  }, [hud.phase, hud.suddenDeath, hud.timeRemaining]);
+
+  // Som de tick a cada número do countdown
+  useEffect(() => {
+    if (hud.phase !== 'countdown') return;
+    const count = Math.ceil(hud.timeRemaining);
+    if (count !== prevCount.current) {
+      prevCount.current = count;
+      if (!muted) {
+        const tick = new Audio('/assets/audio/sfx_countdown.ogg');
+        tick.volume = 0.4;
+        void tick.play().catch(() => undefined);
+      }
+    }
+  }, [hud.phase, hud.timeRemaining, muted]);
+
+  // "LUTE!" quando o countdown vira batalha
+  useEffect(() => {
+    if (prevPhase.current === 'countdown' && hud.phase === 'battle') {
+      setFightFlash(true);
+      setTimeout(() => setFightFlash(false), 1000);
+    }
+    prevPhase.current = hud.phase;
+  }, [hud.phase]);
+
+  // Banner da morte súbita
+  useEffect(() => {
+    if (!prevSudden.current && hud.suddenDeath && hud.phase === 'battle') {
+      setOvertimeBanner(true);
+      setTimeout(() => setOvertimeBanner(false), 2400);
+    }
+    prevSudden.current = hud.suddenDeath;
+  }, [hud.suddenDeath, hud.phase]);
+
+  if (hud.phase === 'waiting' || hud.playerCount < 2) {
+    return (
+      <div className="overlay">
+        <div className="overlay-card">
+          <div className="spinner" />
+          <h2>{isSpectator ? 'Aguardando a partida…' : 'Procurando oponente…'}</h2>
+          {hud.roomCode && (
+            <p className="room-code">
+              Código da sala: <strong>{hud.roomCode}</strong>
+            </p>
+          )}
+          <p>Abra o jogo em outra aba ou aparelho para começar</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (hud.phase === 'countdown') {
+    // Apresentação VS nos primeiros instantes, depois a contagem
+    const totalMatches = rival ? rival.wins + rival.losses + rival.draws : 0;
+    if (hud.timeRemaining > 1.4) {
+      return (
+        <div className="overlay">
+          <div className="vs-panel">
+            <div className="vs-player blue">
+              <span className="vs-name">{hud.myName}</span>
+            </div>
+            <div className="vs-badge">VS</div>
+            <div className="vs-player red">
+              <span className="vs-name">{hud.oppName}</span>
+            </div>
+            {totalMatches > 0 && rival && (
+              <p className="vs-rivalry">
+                {totalMatches + 1}º confronto — placar {rival.wins} × {rival.losses}
+                {rival.draws > 0 ? ` (${rival.draws} empates)` : ''}
+              </p>
+            )}
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div className="overlay transparent">
+        <div className="countdown">{Math.ceil(hud.timeRemaining)}</div>
+      </div>
+    );
+  }
+
+  if (hud.phase === 'ended') {
+    const won = hud.winner === hud.mySide;
+    const draw = hud.winner === 'draw';
+    if (isSpectator) {
+      return (
+        <div className="overlay">
+          <div className="overlay-card result">
+            <div className="result-emoji">🏁</div>
+            <h2>Fim de partida</h2>
+            <p>
+              {hud.myCrowns} 👑 × 👑 {hud.oppCrowns}
+            </p>
+            <button className="play-button" onClick={onExit}>
+              Voltar
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div className="overlay">
+        {won && <Confetti />}
+        <div className="overlay-card result">
+          <div className="result-emoji">{draw ? '🤝' : won ? '👑' : '💔'}</div>
+          <h2>{draw ? 'Empate!' : won ? 'Vitória!' : 'Derrota'}</h2>
+          <p>
+            {hud.myCrowns} 👑 × 👑 {hud.oppCrowns}
+          </p>
+          <div className="result-actions">
+            {hasReplay && (
+              <button className="play-button secondary" onClick={onWatchReplay}>
+                📺 Ver replay
+              </button>
+            )}
+            <button className="play-button" onClick={onExit}>
+              Jogar novamente
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {fightFlash && (
+        <div className="overlay transparent">
+          <div className="fight-flash">LUTE!</div>
+        </div>
+      )}
+      {overtimeBanner && (
+        <div className="overlay transparent">
+          <div className="overtime-banner">
+            ⚡ MORTE SÚBITA ⚡<span>Elixir em dobro!</span>
+          </div>
+        </div>
+      )}
+      {doubleElixirBanner && (
+        <div className="overlay transparent">
+          <div className="overtime-banner elixir-x2">
+            💧 ELIXIR EM DOBRO! 💧<span>Último minuto</span>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+/** Confete de vitória: emojis caindo com posições/delays aleatórios. */
+function Confetti() {
+  const pieces = useRef(
+    Array.from({ length: 26 }, (_, i) => ({
+      left: Math.random() * 100,
+      delay: Math.random() * 1.6,
+      duration: 2.4 + Math.random() * 2,
+      emoji: ['👑', '✨', '🎉', '⭐'][i % 4],
+      size: 16 + Math.random() * 18,
+    })),
+  );
+  return (
+    <div className="confetti" aria-hidden>
+      {pieces.current.map((piece, i) => (
+        <span
+          key={i}
+          style={{
+            left: `${piece.left}%`,
+            animationDelay: `${piece.delay}s`,
+            animationDuration: `${piece.duration}s`,
+            fontSize: piece.size,
+          }}
+        >
+          {piece.emoji}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+/** Pede para deitar o aparelho quando em retrato (via CSS media query). */
+export function OrientationOverlay() {
+  return (
+    <div className="orientation-overlay">
+      <div className="rotate-phone">📱</div>
+      <h2>Gire o aparelho</h2>
+      <p>Claude Royale é jogado na horizontal</p>
+    </div>
+  );
+}
