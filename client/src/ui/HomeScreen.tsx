@@ -6,6 +6,7 @@ import { CardArt } from './CardArt';
 import { CollectionScreen } from './CollectionScreen';
 import { DeckScreen } from './DeckScreen';
 import { ProfileScreen } from './ProfileScreen';
+import { PremiumScreen } from './PremiumScreen';
 import { currentArena } from './achievements';
 import type { Profile } from './profileStorage';
 
@@ -13,7 +14,7 @@ const THEME_LABELS: Record<ArenaTheme, string> = {
   campo: '🌿 Campo', deserto: '🏜️ Deserto', neve: '❄️ Neve', noite: '🌙 Noite',
 };
 
-type Tab = 'batalha' | 'colecao' | 'deck' | 'perfil';
+type Tab = 'batalha' | 'colecao' | 'deck' | 'perfil' | 'passe';
 type PlayOptions = Omit<JoinBattleOptions, 'deck' | 'name' | 'cardLevels'>;
 
 interface HomeScreenProps {
@@ -32,8 +33,9 @@ interface HomeScreenProps {
 
 const TABS: Array<{ id: Tab; label: string; icon: string }> = [
   { id: 'colecao', label: 'Coleção', icon: '🃏' },
-  { id: 'batalha', label: 'Batalha', icon: '⚔️' },
   { id: 'deck', label: 'Deck', icon: '🛡️' },
+  { id: 'batalha', label: 'Batalha', icon: '⚔️' },
+  { id: 'passe', label: 'Passe Real', icon: '👑' },
   { id: 'perfil', label: 'Perfil', icon: '👤' },
 ];
 
@@ -74,6 +76,7 @@ export function HomeScreen({
         {tab === 'colecao' && <CollectionScreen profile={profile} onUpgradeCard={onUpgradeCard} />}
         {tab === 'deck' && <DeckScreen deck={deck} onDeckChange={onDeckChange} />}
         {tab === 'perfil' && <ProfileScreen profile={profile} onNameChange={onNameChange} />}
+        {tab === 'passe' && <PremiumScreen />}
       </div>
 
       <nav className="tab-bar" aria-label="Navegação principal">
