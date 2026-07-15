@@ -13,3 +13,6 @@ client/public/assets/tiny-swords/*
 # Copie da sua compra com tools/fetch-assets.ps1 (seção Synty) após clonar.
 client/public/assets/ui/*
 !client/public/assets/ui/CREDITS.md
+
+# Artefatos dos scripts e2e
+tools/e2e/*.png

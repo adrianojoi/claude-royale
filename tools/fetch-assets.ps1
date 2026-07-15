@@ -1,5 +1,5 @@
 $base = 'https://raw.githubusercontent.com/hoangpx/age-of-tinies/master/art'
-$out = 'c:\Users\Adriano\Documents\Projetos\claude_royale\client\public\assets\tiny-swords'
+$out = Join-Path (Split-Path $PSScriptRoot) 'client\public\assets\tiny-swords'
 
 # destino => caminho no repo (nomes com espaço serão URL-encodados)
 $files = @{
