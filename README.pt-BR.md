@@ -2,7 +2,7 @@
 
 **Batalhas 1v1 estilo Clash Royale, multiplayer em tempo real, direto no navegador** — tela cheia, orientação paisagem, feito para jogar com o celular deitado.
 
-🌐 **Jogue: [clauderoyale.com](https://clauderoyale.com)** · 🇺🇸 [Read in English](README.md)
+🌐 **Jogue: [clauderoyale.net](https://clauderoyale.net)** · 🇺🇸 [Read in English](README.md)
 
 [![CI](https://github.com/adrianojoi/claude-royale/actions/workflows/ci.yml/badge.svg)](https://github.com/adrianojoi/claude-royale/actions/workflows/ci.yml)
 [![Licença: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
@@ -33,7 +33,7 @@ Um projeto de estudo que virou um jogo completo: batalhas 1v1 em tempo real com 
 
 ## Como jogar
 
-**Online:** [clauderoyale.com](https://clauderoyale.com)
+**Online:** [clauderoyale.net](https://clauderoyale.net)
 
 **Local:**
 

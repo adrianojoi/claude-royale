@@ -2,7 +2,7 @@
 
 **Real-time multiplayer Clash Royale-style battler that runs entirely in the browser** — fullscreen, landscape, made to be played with your phone held sideways.
 
-🌐 **Play it: [clauderoyale.com](https://clauderoyale.com)** · 🇧🇷 [Leia em Português](README.pt-BR.md)
+🌐 **Play it: [clauderoyale.net](https://clauderoyale.net)** · 🇧🇷 [Leia em Português](README.pt-BR.md)
 
 [![CI](https://github.com/adrianojoi/claude-royale/actions/workflows/ci.yml/badge.svg)](https://github.com/adrianojoi/claude-royale/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
@@ -33,7 +33,7 @@ A study project that grew into a full game: 1v1 real-time battles with troops, s
 
 ## Play it
 
-**Online:** [clauderoyale.com](https://clauderoyale.com)
+**Online:** [clauderoyale.net](https://clauderoyale.net)
 
 **Locally:**
 
