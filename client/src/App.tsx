@@ -46,6 +46,16 @@ export function App() {
   const [hud, setHud] = useState<HudSnapshot | null>(null);
   const [toast, setToast] = useState('');
   const [muted, setMuted] = useState(false);
+  const [handSide, setHandSide] = useState<'left' | 'right'>(() => {
+    try { return localStorage.getItem('claude-royale:hand-side') === 'right' ? 'right' : 'left'; } catch { return 'left'; }
+  });
+  const toggleHandSide = useCallback(() => {
+    setHandSide((s) => {
+      const next = s === 'left' ? 'right' : 'left';
+      try { localStorage.setItem('claude-royale:hand-side', next); } catch { /* ignora */ }
+      return next;
+    });
+  }, []);
   const [deck, setDeck] = useState<string[]>(loadDeck);
   const [profile, setProfile] = useState<Profile>(loadProfile);
   const [theme, setTheme] = useState<ArenaTheme>(loadTheme);
@@ -408,7 +418,7 @@ export function App() {
   }
 
   return (
-    <div className={`battle-root ${hud?.suddenDeath && hud.phase === 'battle' ? 'overtime' : ''} ${hud?.tiebreaker && hud.phase === 'battle' ? 'tiebreaker' : ''}`}>
+    <div className={`battle-root hand-${handSide} ${hud?.suddenDeath && hud.phase === 'battle' ? 'overtime' : ''} ${hud?.tiebreaker && hud.phase === 'battle' ? 'tiebreaker' : ''}`}>
       <div ref={gameHostRef} className="game-host" />
       {hud && (
         <>
@@ -417,6 +427,7 @@ export function App() {
             muted={muted}
             onToggleMute={() => setMuted((m) => !m)}
             onSurrender={isSpectator ? undefined : () => roomRef.current?.send('surrender')}
+            onToggleHandSide={toggleHandSide}
           />
           {!isSpectator && (
             <div className="bottom-hud">

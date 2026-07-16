@@ -197,5 +197,6 @@ export const en = {
     rotateTitle: 'Rotate your device',
     rotateBody: 'Claude Royale is played in landscape',
     spectator: '👁 SPECTATOR',
+    handSide: 'Switch card side',
   },
 };

@@ -196,6 +196,7 @@ export const ptBR = {
     rotateTitle: 'Gire o aparelho',
     rotateBody: 'Claude Royale é jogado na horizontal',
     spectator: '👁 ESPECTADOR',
+    handSide: 'Trocar lado das cartas',
   },
   cards: {
     flechas: { name: 'Salva', desc: 'Uma salva de flechas cobre uma área ampla com dano leve.' },

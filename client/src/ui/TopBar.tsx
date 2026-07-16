@@ -7,9 +7,10 @@ interface TopBarProps {
   muted: boolean;
   onToggleMute: () => void;
   onSurrender?: () => void;
+  onToggleHandSide?: () => void;
 }
 
-export function TopBar({ hud, muted, onToggleMute, onSurrender }: TopBarProps) {
+export function TopBar({ hud, muted, onToggleMute, onSurrender, onToggleHandSide }: TopBarProps) {
   const { t } = useI18n();
   const minutes = Math.floor(Math.max(0, hud.timeRemaining) / 60);
   const seconds = Math.floor(Math.max(0, hud.timeRemaining) % 60);
@@ -37,6 +38,11 @@ export function TopBar({ hud, muted, onToggleMute, onSurrender }: TopBarProps) {
         {onSurrender && hud.phase === 'battle' && (
           <button className="icon-button" onClick={onSurrender} aria-label={t('battle.surrender')}>
             🏳️
+          </button>
+        )}
+        {onToggleHandSide && (
+          <button className="icon-button" onClick={onToggleHandSide} aria-label={t('battle.handSide')}>
+            ⇄
           </button>
         )}
         <button className="icon-button" onClick={onToggleMute} aria-label={t('battle.sound')}>
