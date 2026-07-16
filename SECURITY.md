@@ -8,7 +8,7 @@ Only the latest release (and `master`) receives security fixes.
 
 Please **do not open a public issue** for security vulnerabilities.
 
-- Email: **info@joinvix.com.br** with subject `[SECURITY] Claude Royale`
+- Email: **security@clauderoyale.net** with subject `[SECURITY] Claude Royale`
 - Or use GitHub's private vulnerability reporting on this repository
   (Security → Report a vulnerability).
 
