@@ -11,6 +11,10 @@
 [![Status](https://img.shields.io/badge/status-live-brightgreen)](https://stats.uptimerobot.com/wHLcslngdD)
 ![Stack](https://img.shields.io/badge/Phaser%203%20·%20React%20·%20Colyseus-TypeScript-3178c6)
 
+<p align="center">
+  <img src="docs/media/gameplay.gif" alt="Claude Royale gameplay — live 1v1 battle" width="720">
+</p>
+
 | | |
 |---|---|
 | ![Home screen](docs/screenshots/home.png) | ![Live battle](docs/screenshots/battle.png) |
@@ -99,6 +103,28 @@ claude_royale/
 ├── server/   # Node + Colyseus (BattleRoom mirrors the simulation into the schema)
 ├── shared/   # cards, constants, projection and ALL the simulation
 └── tools/    # Playwright e2e scripts, asset fetcher
+```
+
+```mermaid
+flowchart LR
+  subgraph Browser
+    UI["React UI<br/>(hand, HUD, screens)"]
+    ARENA["Phaser 3 arena<br/>(2.5D projection)"]
+    NET["Colyseus client"]
+    UI --> NET
+    ARENA --> NET
+  end
+  NET -- "intents (playCard)" --> ROOM
+  ROOM -- "state @ 20 ticks/s" --> NET
+  subgraph Server["Node server (Fly.io)"]
+    ROOM["BattleRoom<br/>(authoritative)"]
+  end
+  subgraph Shared["shared/ — pure TypeScript"]
+    SIM["Deterministic simulation<br/>cards - combat - pathing"]
+  end
+  ROOM --> SIM
+  SIM -.-> BOTS["Bots + balance simulator"]
+  SIM -.-> TESTS["Vitest unit tests"]
 ```
 
 **Principles**
