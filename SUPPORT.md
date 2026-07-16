@@ -6,6 +6,7 @@
 - 🐛 Found a bug? [Open an issue](https://github.com/adrianojoi/claude-royale/issues/new/choose)
 - 💬 Questions and ideas: [GitHub Discussions](https://github.com/adrianojoi/claude-royale/discussions)
 - 📧 Direct support: **support@clauderoyale.net**
+- 📊 Is the game down? Check the [status page](https://stats.uptimerobot.com/wHLcslngdD)
 
 ## Contact addresses
 
