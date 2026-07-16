@@ -2,9 +2,9 @@
 
 **Claude Royale** is a real-time 1v1 Clash Royale-style battler that runs in your browser — free, no install.
 
-🎮 **Play now:** https://clauderoyale.net
-💻 **Open source:** https://github.com/adrianojoi/claude-royale
-🕹️ **itch.io page:** https://clauderoyale.itch.io/claude-royale
+🎮 **Play now:** <https://clauderoyale.net>
+💻 **Open source:** <https://github.com/adrianojoi/claude-royale>
+🕹️ **itch.io page:** <https://clauderoyale.itch.io/claude-royale>
 
 ## Where to start
 - 📢 **#announcements** — game news and updates
