@@ -400,7 +400,7 @@ export function App() {
   }
 
   return (
-    <div className={`battle-root ${hud?.suddenDeath && hud.phase === 'battle' ? 'overtime' : ''}`}>
+    <div className={`battle-root ${hud?.suddenDeath && hud.phase === 'battle' ? 'overtime' : ''} ${hud?.tiebreaker && hud.phase === 'battle' ? 'tiebreaker' : ''}`}>
       <div ref={gameHostRef} className="game-host" />
       {hud && (
         <>

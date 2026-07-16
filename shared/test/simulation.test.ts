@@ -153,33 +153,43 @@ describe('combate e vitória', () => {
     expect(state.phase).toBe('battle');
   });
 
-  test('desempate: torre do rei com menos vida cai primeiro e define o vencedor', () => {
+  test('desempate: qualquer torre com menor % cai primeiro e faz o time perder', () => {
     const state = createBattleState();
     state.suddenDeath = true;
     state.tiebreaker = true;
     state.timeRemaining = 0;
-    const leftKing = Object.values(state.entities).find(
-      (e) => e.side === 'left' && e.tower === 'king',
+    // Uma princesa da direita está bem fraca: cai primeiro → direita perde.
+    const rightPrincess = Object.values(state.entities).find(
+      (e) => e.side === 'right' && e.tower === 'princess',
     )!;
-    const rightKing = Object.values(state.entities).find(
-      (e) => e.side === 'right' && e.tower === 'king',
-    )!;
-    // Direita começa com menos vida: deve cair primeiro → esquerda vence.
-    leftKing.hp = 2000;
-    rightKing.hp = 300;
-    runSeconds(state, 10);
+    rightPrincess.hp = 80;
+    runSeconds(state, 6);
     expect(state.phase).toBe('ended');
     expect(state.winner).toBe('left');
   });
 
-  test('desempate: só empata se as torres do rei zerarem com a mesma vida', () => {
+  test('desempate rápido: uma torre cheia esvazia em ~5s', () => {
     const state = createBattleState();
     state.suddenDeath = true;
     state.tiebreaker = true;
     state.timeRemaining = 0;
-    const kings = Object.values(state.entities).filter((e) => e.tower === 'king');
-    for (const k of kings) k.hp = 200; // exatamente igual
-    runSeconds(state, 10);
+    // Direita com uma princesa levemente mais fraca decide, mas a partida
+    // não pode passar de ~5s (todas as torres cheias esvaziam nesse tempo).
+    const rp = Object.values(state.entities).find(
+      (e) => e.side === 'right' && e.tower === 'princess',
+    )!;
+    rp.hp = rp.maxHp - 1;
+    runSeconds(state, 5.2);
+    expect(state.phase).toBe('ended');
+  });
+
+  test('desempate: empate quando os dois lados perdem torre no mesmo tick com vidas iguais', () => {
+    const state = createBattleState();
+    state.suddenDeath = true;
+    state.tiebreaker = true;
+    state.timeRemaining = 0;
+    // Torres perfeitamente simétricas: caem juntas com vida total igual → empate.
+    runSeconds(state, 6);
     expect(state.phase).toBe('ended');
     expect(state.winner).toBe('draw');
   });

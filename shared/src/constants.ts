@@ -28,11 +28,11 @@ export const COUNTDOWN_SECONDS = 7;
 export const BATTLE_SECONDS = 180;
 export const SUDDEN_DEATH_SECONDS = 60;
 /**
- * Desempate final (após a morte súbita ainda empatada): as duas torres do rei
- * perdem vida ao mesmo tempo até uma cair. ~150/s esvazia um rei cheio (2600) em
- * ~17s — rápido o bastante para superar qualquer cura e garantir um vencedor.
+ * Desempate final (após a morte súbita ainda empatada): TODAS as torres drenam
+ * vida proporcionalmente e uma torre cheia esvazia neste tempo (s). A torre com
+ * menor % de vida cai primeiro e decide o perdedor.
  */
-export const TIEBREAKER_DRAIN_PER_SECOND = 150;
+export const TIEBREAKER_DRAIN_SECONDS = 5;
 
 export const HAND_SIZE = 4;
 

@@ -217,12 +217,12 @@ export function BattleOverlays({
       {tiebreakerBanner && (
         <div className="overlay transparent">
           <div className="overtime-banner tiebreaker">
-            👑 DESEMPATE 👑<span>As torres do rei perdem vida — a primeira a cair perde!</span>
+            ⚡ DESEMPATE ⚡<span>Todas as torres perdem vida — a primeira a cair decide!</span>
           </div>
         </div>
       )}
       {hud.tiebreaker && hud.phase === 'battle' && (
-        <div className="tiebreaker-tag">👑 Desempate — torres drenando</div>
+        <div className="tiebreaker-tag">⚡ Desempate — todas as torres drenando</div>
       )}
       {doubleElixirBanner && (
         <div className="overlay transparent">

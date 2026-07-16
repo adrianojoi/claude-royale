@@ -2,7 +2,7 @@ import {
   BATTLE_SECONDS, BRIDGE_HALF_HEIGHT, BRIDGE_YS, DOUBLE_ELIXIR_LAST_SECONDS,
   ELIXIR_MAX, ELIXIR_PER_SECOND, GRID_H, KING_TOWER, PRINCESS_TOWER,
   PROJECTILE_SPEED, RIVER_CENTER_X, RIVER_MAX_X, RIVER_MIN_X,
-  SUDDEN_DEATH_ELIXIR_MULTIPLIER, SUDDEN_DEATH_SECONDS, TIEBREAKER_DRAIN_PER_SECOND,
+  SUDDEN_DEATH_ELIXIR_MULTIPLIER, SUDDEN_DEATH_SECONDS, TIEBREAKER_DRAIN_SECONDS,
   TOWER_RADIUS, UNIT_RADIUS,
 } from '../constants';
 import { getCard, levelMultiplier } from '../cards';
@@ -662,9 +662,10 @@ function removeDeadEntities(state: SimState): void {
 function updateClock(state: SimState, dt: number): void {
   if (state.phase !== 'battle') return;
 
-  // Desempate final: as duas torres do rei drenam vida ao mesmo tempo até uma cair.
+  // Desempate final: TODAS as torres drenam vida rápido; a primeira a cair
+  // faz o time dono perder.
   if (state.tiebreaker) {
-    drainKingTowers(state, dt);
+    drainAllTowers(state, dt);
     return;
   }
 
@@ -685,43 +686,43 @@ function updateClock(state: SimState, dt: number): void {
 }
 
 /**
- * Desempate: as duas torres do rei perdem vida no mesmo ritmo. A que zerar
- * primeiro cai pelo fluxo normal (coroa + fim). Só é empate se as duas zerarem
- * no mesmo instante COM a mesma vida.
+ * Desempate: TODAS as torres (rei + princesas) drenam vida proporcionalmente —
+ * cada torre cheia esvazia em TIEBREAKER_DRAIN_SECONDS (~5s), então a torre com
+ * MENOR % de vida cai primeiro e faz o time dono perder. Empate só se torres dos
+ * dois lados zerarem no mesmo tick com a mesma vida total restante.
  */
-function drainKingTowers(state: SimState, dt: number): void {
-  const kings = Object.values(state.entities).filter(
-    (e) => e.kind === 'tower' && e.tower === 'king',
+function drainAllTowers(state: SimState, dt: number): void {
+  const towers = Object.values(state.entities).filter(
+    (e) => e.kind === 'tower' && e.hp > 0,
   );
-  const leftKing = kings.find((k) => k.side === 'left');
-  const rightKing = kings.find((k) => k.side === 'right');
-  // Se uma já caiu, o fluxo normal de morte já encerrou a partida.
-  if (!leftKing || !rightKing) return;
+  if (towers.length === 0) return;
 
-  const drain = TIEBREAKER_DRAIN_PER_SECOND * dt;
-  const leftBefore = leftKing.hp;
-  const rightBefore = rightKing.hp;
-  leftKing.hp -= drain;
-  rightKing.hp -= drain;
-
-  const leftDead = leftKing.hp <= 0;
-  const rightDead = rightKing.hp <= 0;
-  if (!leftDead && !rightDead) return; // ainda drenando — as barras baixam juntas
-
-  if (leftDead && rightDead) {
-    leftKing.hp = 0;
-    rightKing.hp = 0;
-    // Zeraram no mesmo tick: empate só se estavam com a MESMA vida.
-    if (leftBefore === rightBefore) {
-      endBattle(state, 'draw');
-    } else {
-      endBattle(state, leftBefore > rightBefore ? 'left' : 'right');
-    }
-    return;
+  for (const t of towers) {
+    t.hp -= (t.maxHp / TIEBREAKER_DRAIN_SECONDS) * dt;
   }
 
-  // Só uma zerou: removeDeadEntities a destrói no próximo tick (coroa + fim).
-  (leftDead ? leftKing : rightKing).hp = 0;
+  const downed = towers.filter((t) => t.hp <= 0);
+  if (downed.length === 0) return; // ainda drenando — todas as barras baixam
+
+  // Explosão visual das torres que caíram neste tick.
+  for (const t of downed) {
+    t.hp = 0;
+    state.events.push({ type: 'death', x: t.x, y: t.y, kind: 'tower' });
+  }
+
+  const leftDown = downed.some((t) => t.side === 'left');
+  const rightDown = downed.some((t) => t.side === 'right');
+  if (leftDown !== rightDown) {
+    // Só um lado perdeu torre: esse time perde.
+    endBattle(state, leftDown ? 'right' : 'left');
+    return;
+  }
+  // Empate no mesmo tick: decide pela vida total restante das torres.
+  const totalHp = (side: Side) =>
+    towers.filter((t) => t.side === side).reduce((s, t) => s + Math.max(0, t.hp), 0);
+  const l = totalHp('left');
+  const r = totalHp('right');
+  endBattle(state, l === r ? 'draw' : l > r ? 'left' : 'right');
 }
 
 function endBattle(state: SimState, winner: Side | 'draw'): void {
