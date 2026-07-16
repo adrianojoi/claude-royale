@@ -186,7 +186,7 @@ function BattleTab({
         </aside>
 
         <section className="dash-center">
-          <img className="menu-logo" src="/logo.png" alt="Claude Royale — uma nova batalha começa" />
+          <img className="menu-logo" src="/logo.png" alt="Claude Royale" />
           <div className="deck-ready">✦ Deck pronto ✦</div>
           <button className="battle-cta" onClick={() => onPlay({})} disabled={connecting}>
             <span className="battle-cta-shine" aria-hidden="true" />
