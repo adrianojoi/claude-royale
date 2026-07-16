@@ -20,6 +20,14 @@ primary_region = 'gru'
   auto_start_machines = true
   min_machines_running = 1
 
+  # Reinicia a maquina automaticamente se o servidor travar
+  [[http_service.checks]]
+    interval = '30s'
+    timeout = '5s'
+    grace_period = '15s'
+    method = 'GET'
+    path = '/leaderboard'
+
 [[vm]]
   size = 'shared-cpu-1x'
   memory = '512mb'
