@@ -1,6 +1,6 @@
 # Página do itch.io — Claude Royale
 
-Conta: **claudeclash.itch.io** · Dashboard → **Create new project**
+Conta: **clauderoyale.itch.io** · Dashboard → **Create new project**
 
 Tudo abaixo é para copiar/colar. Arquivos prontos nesta pasta:
 - `claude-royale-itch.zip` — o launcher jogável (index.html na raiz)
@@ -13,7 +13,7 @@ Tudo abaixo é para copiar/colar. Arquivos prontos nesta pasta:
 
 **Title:** `Claude Royale`
 
-**Project URL:** `claudeclash.itch.io/claude-royale` (ou deixe `claude-royale`)
+**Project URL:** `clauderoyale.itch.io/claude-royale` (ou deixe `claude-royale`)
 
 **Short description / tagline:**
 ```
@@ -62,7 +62,7 @@ Open the game in **two tabs** (or two phones) and press ⚔️ Battle in both �
 
 ### Open source
 Code is MIT-licensed and on GitHub — contributions welcome:
-https://github.com/adrianojoi/claude-royale
+https://github.com/adrianoreinert/claude-royale
 
 *Made with Phaser 3 + React + Colyseus. Art: "Tiny Swords" by Pixel Frog. Music/SFX: Kenney (CC0).*
 
@@ -87,7 +87,7 @@ multiplayer, real-time, strategy, clash-royale, pvp, card-game, browser, mobile,
 
 **Links (opcional, "More information"):**
 - Website: `https://clauderoyale.net`
-- Source code: `https://github.com/adrianojoi/claude-royale`
+- Source code: `https://github.com/adrianoreinert/claude-royale`
 - Community / Discord: `https://discord.gg/CCnKH4XBmy`
 
 ---

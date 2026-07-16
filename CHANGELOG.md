@@ -38,5 +38,5 @@ by component composition, champions and evolutions, versioned data-driven balanc
 fullscreen landscape. Phaser 3 + React client, Colyseus authoritative server at 20 ticks/s,
 deterministic shared simulation in pure TypeScript.
 
-[0.2.0]: https://github.com/adrianojoi/claude-royale/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/adrianojoi/claude-royale/releases/tag/v0.1.0
+[0.2.0]: https://github.com/adrianoreinert/claude-royale/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/adrianoreinert/claude-royale/releases/tag/v0.1.0

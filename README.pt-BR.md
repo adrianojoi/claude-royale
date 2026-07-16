@@ -4,9 +4,9 @@
 
 🌐 **Jogue: [clauderoyale.net](https://clauderoyale.net)** · 🇺🇸 [Read in English](README.md)
 
-[![CI](https://github.com/adrianojoi/claude-royale/actions/workflows/ci.yml/badge.svg)](https://github.com/adrianojoi/claude-royale/actions/workflows/ci.yml)
+[![CI](https://github.com/adrianoreinert/claude-royale/actions/workflows/ci.yml/badge.svg)](https://github.com/adrianoreinert/claude-royale/actions/workflows/ci.yml)
 [![Licença: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Release](https://img.shields.io/github/v/release/adrianojoi/claude-royale?color=blue)](https://github.com/adrianojoi/claude-royale/releases)
+[![Release](https://img.shields.io/github/v/release/adrianoreinert/claude-royale?color=blue)](https://github.com/adrianoreinert/claude-royale/releases)
 [![PRs bem-vindos](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Status](https://img.shields.io/badge/status-live-brightgreen)](https://stats.uptimerobot.com/wHLcslngdD)
 [![Discord](https://img.shields.io/badge/Discord-entrar-5865F2?logo=discord&logoColor=white)](https://discord.gg/CCnKH4XBmy)
@@ -170,7 +170,7 @@ A UI dos menus usa opcionalmente o pack pago **Synty Interface — Fantasy Menus
 
 ## Contribuindo
 
-PRs são bem-vindos! Leia o [CONTRIBUTING.md](CONTRIBUTING.md) e confira as [issues](https://github.com/adrianojoi/claude-royale/issues) — procure por `good first issue`. Siga o [Código de Conduta](CODE_OF_CONDUCT.md); vulnerabilidades vão por [SECURITY.md](SECURITY.md).
+PRs são bem-vindos! Leia o [CONTRIBUTING.md](CONTRIBUTING.md) e confira as [issues](https://github.com/adrianoreinert/claude-royale/issues) — procure por `good first issue`. Siga o [Código de Conduta](CODE_OF_CONDUCT.md); vulnerabilidades vão por [SECURITY.md](SECURITY.md).
 
 Dúvidas ou precisa de ajuda? Veja o [SUPPORT.md](SUPPORT.md) ou escreva para **hello@clauderoyale.net**.
 
