@@ -88,6 +88,7 @@ multiplayer, real-time, strategy, clash-royale, pvp, card-game, browser, mobile,
 **Links (opcional, "More information"):**
 - Website: `https://clauderoyale.net`
 - Source code: `https://github.com/adrianojoi/claude-royale`
+- Community / Discord: `https://discord.gg/CCnKH4XBmy`
 
 ---
 
