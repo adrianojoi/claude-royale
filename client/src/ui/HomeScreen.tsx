@@ -1,18 +1,20 @@
 import { useEffect, useState } from 'react';
 import { getCard, type BotDifficulty } from '@claude-royale/shared';
-import { fetchLeaderboard, type JoinBattleOptions } from '../net/connection';
+import { fetchLeaderboard, subscribeEmail, type JoinBattleOptions } from '../net/connection';
 import { ARENA_PALETTES, isArenaTheme, type ArenaTheme } from '../game/arena';
 import { useI18n } from '../i18n';
 import { CardArt } from './CardArt';
 import { CollectionScreen } from './CollectionScreen';
 import { DeckScreen } from './DeckScreen';
 import { ProfileScreen } from './ProfileScreen';
-import { PremiumScreen } from './PremiumScreen';
+import { DevNoticeModal } from './DevNoticeModal';
 import { currentArena, nextArena } from './achievements';
 import type { Profile } from './profileStorage';
 
-type Tab = 'batalha' | 'colecao' | 'deck' | 'perfil' | 'passe';
+type Tab = 'batalha' | 'colecao' | 'deck' | 'perfil';
 type PlayOptions = Omit<JoinBattleOptions, 'deck' | 'name' | 'cardLevels'>;
+
+const DEV_NOTICE_KEY = 'claude-royale:dev-notice-v1';
 
 interface HomeScreenProps {
   connecting: boolean;
@@ -32,7 +34,6 @@ const TABS: Array<{ id: Tab; icon: string }> = [
   { id: 'colecao', icon: '🃏' },
   { id: 'deck', icon: '🛡️' },
   { id: 'batalha', icon: '⚔️' },
-  { id: 'passe', icon: '👑' },
   { id: 'perfil', icon: '👤' },
 ];
 
@@ -42,22 +43,33 @@ export function HomeScreen({
 }: HomeScreenProps) {
   const { t } = useI18n();
   const [tab, setTab] = useState<Tab>('batalha');
+  const [showDevNotice, setShowDevNotice] = useState(false);
   const arena = currentArena(profile.trophies);
+
+  // Aviso "em desenvolvimento" uma vez por dispositivo, após o cadastro.
+  useEffect(() => {
+    if (!profile.registered) return;
+    try {
+      if (!localStorage.getItem(DEV_NOTICE_KEY)) setShowDevNotice(true);
+    } catch {
+      // storage indisponível
+    }
+  }, [profile.registered]);
+
+  const dismissDevNotice = () => {
+    setShowDevNotice(false);
+    try { localStorage.setItem(DEV_NOTICE_KEY, '1'); } catch { /* ignora */ }
+  };
 
   return (
     <div className="home-screen">
       {!profile.registered && <OnboardingModal onRegister={onRegister} />}
+      {showDevNotice && <DevNoticeModal onClose={dismissDevNotice} />}
       <header className="home-header">
-        <div className="profile-plate">
+        <button className="profile-plate" onClick={() => setTab('perfil')} aria-label={t('tabs.perfil')}>
           <span className="header-emblem">{arena.emoji}</span>
           <div className="header-identity">
-            <input
-              className="profile-name"
-              value={profile.name}
-              maxLength={16}
-              onChange={(e) => onNameChange(e.target.value)}
-              aria-label={t('home.playerName')}
-            />
+            <span className="profile-name">{profile.name}</span>
             <div className="header-xp">
               <div
                 className="header-xp-fill"
@@ -66,7 +78,7 @@ export function HomeScreen({
             </div>
           </div>
           <span className="header-badge">{profile.trophies}</span>
-        </div>
+        </button>
         <div className="currency-bar">
           <span className="currency">🏆 {profile.trophies}</span>
           <span className="currency">🪙 {profile.gold}</span>
@@ -92,7 +104,6 @@ export function HomeScreen({
         {tab === 'colecao' && <CollectionScreen profile={profile} onUpgradeCard={onUpgradeCard} />}
         {tab === 'deck' && <DeckScreen deck={deck} onDeckChange={onDeckChange} />}
         {tab === 'perfil' && <ProfileScreen profile={profile} onNameChange={onNameChange} />}
-        {tab === 'passe' && <PremiumScreen />}
       </div>
 
       <nav className="tab-bar" aria-label={t('home.mainNav')}>
@@ -161,13 +172,13 @@ function BattleTab({
             <img className="rank-emblem" src="/assets/ui/crest-gold.png" alt="" />
             <span className="rank-arena-emoji">{arena.emoji}</span>
           </div>
-          <p className="rank-name">{arena.name}</p>
+          <p className="rank-name">{t(`arenas.${arena.id}`)}</p>
           <div className="rank-progress" role="progressbar" aria-valuenow={arenaProgress} aria-valuemin={0} aria-valuemax={100}>
             <div className="rank-progress-fill" style={{ width: `${arenaProgress}%` }} />
           </div>
           <p className="rank-progress-label">
             {next
-              ? t('home.arenaProgress', { trophies: profile.trophies, min: next.minTrophies, emoji: next.emoji, name: next.name })
+              ? t('home.arenaProgress', { trophies: profile.trophies, min: next.minTrophies, emoji: next.emoji, name: t(`arenas.${next.id}`) })
               : t('home.arenaMax')}
           </p>
           {leaderboard.length > 0 && (
@@ -187,7 +198,8 @@ function BattleTab({
           <div className="deck-ready">{t('home.deckReady')}</div>
           <button className="battle-cta" onClick={() => onPlay({})} disabled={connecting}>
             <span className="battle-cta-shine" aria-hidden="true" />
-            {connecting ? t('common.connecting') : t('common.battle')}
+            <img className="battle-cta-icon" src="/assets/ui/icon-swords.png" alt="" aria-hidden="true" />
+            <span>{connecting ? t('common.connecting') : t('common.battle')}</span>
           </button>
           <div className="dash-secondary">
             <button
@@ -221,7 +233,7 @@ function BattleTab({
             ))}
           </div>
 
-          <details className="more-options">
+          <details className="more-options" open>
             <summary>{t('home.moreOptions')}</summary>
             <div className="friend-row">
               <input
@@ -307,17 +319,33 @@ function BattleTab({
   );
 }
 
-/** Cadastro no primeiro acesso: escolhe o nome de batalha. */
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+/** Cadastro no primeiro acesso: nome de batalha + e-mail (obrigatório). */
 function OnboardingModal({ onRegister }: { onRegister: (name: string) => void }) {
   const { t } = useI18n();
   const [name, setName] = useState('');
-  const valid = name.trim().length >= 2;
+  const [email, setEmail] = useState('');
+  const [wantsUpdates, setWantsUpdates] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const nameOk = name.trim().length >= 2;
+  const emailOk = EMAIL_RE.test(email.trim());
+  const valid = nameOk && emailOk;
+
+  const submit = async () => {
+    if (!valid || submitting) return;
+    setSubmitting(true);
+    // Registra o e-mail (não bloqueia a entrada se o servidor falhar).
+    void subscribeEmail(email.trim(), 'onboarding', name.trim(), wantsUpdates);
+    onRegister(name.trim());
+  };
+
   return (
     <div className="modal-backdrop onboarding">
       <div className="modal-card onboarding-card">
         <img className="onboarding-logo" src="/logo.png" alt="Claude Royale" />
-        <h3>{t('home.createProfile')}</h3>
-        <p className="modal-type">{t('home.chooseName')}</p>
+        <h3>{t('onboarding.title')}</h3>
+        <p className="modal-type">{t('onboarding.subtitle')}</p>
         <input
           className="code-input name-input"
           placeholder={t('home.yourName')}
@@ -325,14 +353,29 @@ function OnboardingModal({ onRegister }: { onRegister: (name: string) => void })
           value={name}
           autoFocus
           onChange={(e) => setName(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && valid && onRegister(name.trim())}
         />
-        <button
-          className="play-button"
-          disabled={!valid}
-          onClick={() => onRegister(name.trim())}
-        >
-          {t('home.start')}
+        <input
+          className="code-input name-input"
+          type="email"
+          placeholder={t('onboarding.email')}
+          maxLength={254}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && submit()}
+        />
+        {email.length > 0 && !emailOk && (
+          <p className="onboarding-error">{t('onboarding.emailInvalid')}</p>
+        )}
+        <label className={`party-toggle ${wantsUpdates ? 'on' : ''}`}>
+          <input
+            type="checkbox"
+            checked={wantsUpdates}
+            onChange={(e) => setWantsUpdates(e.target.checked)}
+          />
+          {t('onboarding.wantsUpdates')}
+        </label>
+        <button className="play-button" disabled={!valid || submitting} onClick={submit}>
+          {t('onboarding.start')}
         </button>
       </div>
     </div>

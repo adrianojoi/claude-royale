@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { getCard } from '@claude-royale/shared';
 import type { HudSnapshot } from '../net/connection';
+import { useI18n } from '../i18n';
 import type { RivalRecord } from './profileStorage';
 
 interface BattleOverlaysProps {
@@ -14,11 +15,13 @@ interface BattleOverlaysProps {
   hasReplay: boolean;
   onWatchReplay: () => void;
   onExit: () => void;
+  onRematch: () => void;
 }
 
 export function BattleOverlays({
-  hud, muted, isSpectator, rival, deck, recentResults, hasReplay, onWatchReplay, onExit,
+  hud, muted, isSpectator, rival, deck, recentResults, hasReplay, onWatchReplay, onExit, onRematch,
 }: BattleOverlaysProps) {
+  const { t } = useI18n();
   const [fightFlash, setFightFlash] = useState(false);
   const [overtimeBanner, setOvertimeBanner] = useState(false);
   const [tiebreakerBanner, setTiebreakerBanner] = useState(false);
@@ -90,10 +93,10 @@ export function BattleOverlays({
       <div className="overlay">
         <div className="overlay-card">
           <div className="spinner" />
-          <h2>{isSpectator ? 'Aguardando a partida…' : 'Procurando oponente…'}</h2>
+          <h2>{isSpectator ? t('battle.waitingSpectator') : t('battle.searching')}</h2>
           {hud.roomCode && (
             <p className="room-code">
-              Código da sala: <strong>{hud.roomCode}</strong>
+              {t('battle.roomCode')} <strong>{hud.roomCode}</strong>
             </p>
           )}
           {deck && deck.length > 0 && (
@@ -110,13 +113,13 @@ export function BattleOverlays({
           )}
           {recentResults && recentResults.length > 0 && (
             <p className="queue-form">
-              Forma recente:{' '}
+              {t('battle.recentForm')}{' '}
               {recentResults.map((r, i) => (
                 <span key={i}>{r === 'win' ? '🟢' : r === 'loss' ? '🔴' : '⚪'}</span>
               ))}
             </p>
           )}
-          <p>Abra o jogo em outra aba ou aparelho para começar</p>
+          <p>{t('battle.openOtherTab')}</p>
         </div>
       </div>
     );
@@ -142,8 +145,8 @@ export function BattleOverlays({
             </div>
             {totalMatches > 0 && rival && (
               <p className="vs-rivalry">
-                {totalMatches + 1}º confronto — placar {rival.wins} × {rival.losses}
-                {rival.draws > 0 ? ` (${rival.draws} empates)` : ''}
+                {t('battle.rivalry', { n: totalMatches + 1, w: rival.wins, l: rival.losses })}
+                {rival.draws > 0 ? t('battle.rivalryDraws', { d: rival.draws }) : ''}
               </p>
             )}
           </div>
@@ -165,12 +168,12 @@ export function BattleOverlays({
         <div className="overlay">
           <div className="overlay-card result">
             <div className="result-emoji">🏁</div>
-            <h2>Fim de partida</h2>
+            <h2>{t('common.matchOver')}</h2>
             <p>
               {hud.myCrowns} 👑 × 👑 {hud.oppCrowns}
             </p>
-            <button className="play-button" onClick={onExit}>
-              Voltar
+            <button className="result-button" onClick={onExit}>
+              {t('common.menu')}
             </button>
           </div>
         </div>
@@ -181,18 +184,21 @@ export function BattleOverlays({
         {won && <Confetti />}
         <div className="overlay-card result">
           <div className="result-emoji">{draw ? '🤝' : won ? '👑' : '💔'}</div>
-          <h2>{draw ? 'Empate!' : won ? 'Vitória!' : 'Derrota'}</h2>
+          <h2>{draw ? t('common.drawTitle') : won ? t('common.victory') : t('common.defeat')}</h2>
           <p>
             {hud.myCrowns} 👑 × 👑 {hud.oppCrowns}
           </p>
           <div className="result-actions">
+            <button className="result-button primary" onClick={onRematch}>
+              {t('common.playAgain')}
+            </button>
             {hasReplay && (
-              <button className="play-button secondary" onClick={onWatchReplay}>
-                📺 Ver replay
+              <button className="result-button" onClick={onWatchReplay}>
+                {t('common.watchReplay')}
               </button>
             )}
-            <button className="play-button" onClick={onExit}>
-              Jogar novamente
+            <button className="result-button" onClick={onExit}>
+              {t('common.menu')}
             </button>
           </div>
         </div>
@@ -204,30 +210,30 @@ export function BattleOverlays({
     <>
       {fightFlash && (
         <div className="overlay transparent">
-          <div className="fight-flash">LUTE!</div>
+          <div className="fight-flash">{t('battle.fight')}</div>
         </div>
       )}
       {overtimeBanner && (
         <div className="overlay transparent">
           <div className="overtime-banner">
-            ⚡ MORTE SÚBITA ⚡<span>Elixir em dobro!</span>
+            {t('battle.suddenDeath')}<span>{t('battle.suddenDeathSub')}</span>
           </div>
         </div>
       )}
       {tiebreakerBanner && (
         <div className="overlay transparent">
           <div className="overtime-banner tiebreaker">
-            ⚡ DESEMPATE ⚡<span>Todas as torres perdem vida — a primeira a cair decide!</span>
+            {t('battle.tiebreaker')}<span>{t('battle.tiebreakerSub')}</span>
           </div>
         </div>
       )}
       {hud.tiebreaker && hud.phase === 'battle' && (
-        <div className="tiebreaker-tag">⚡ Desempate — todas as torres drenando</div>
+        <div className="tiebreaker-tag">{t('battle.tiebreakerTag')}</div>
       )}
       {doubleElixirBanner && (
         <div className="overlay transparent">
           <div className="overtime-banner elixir-x2">
-            💧 ELIXIR EM DOBRO! 💧<span>Último minuto</span>
+            {t('battle.doubleElixir')}<span>{t('battle.doubleElixirSub')}</span>
           </div>
         </div>
       )}
@@ -267,11 +273,12 @@ function Confetti() {
 
 /** Pede para deitar o aparelho quando em retrato (via CSS media query). */
 export function OrientationOverlay() {
+  const { t } = useI18n();
   return (
     <div className="orientation-overlay">
       <div className="rotate-phone">📱</div>
-      <h2>Gire o aparelho</h2>
-      <p>Claude Royale é jogado na horizontal</p>
+      <h2>{t('battle.rotateTitle')}</h2>
+      <p>{t('battle.rotateBody')}</p>
     </div>
   );
 }

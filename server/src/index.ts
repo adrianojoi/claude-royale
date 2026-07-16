@@ -4,6 +4,7 @@ import { WebSocketTransport } from '@colyseus/ws-transport';
 import { BattleRoom } from './BattleRoom';
 import { lookupRoomByCode } from './roomRegistry';
 import { topPlayers } from './leaderboard';
+import { addSubscriber } from './subscribers';
 import { handleAdminRequest } from './admin';
 import { loadRemoteProfile, saveRemoteProfile } from './profileStore';
 
@@ -57,6 +58,26 @@ const httpServer = http.createServer(async (req, res) => {
     } else {
       res.writeHead(404);
       res.end(JSON.stringify({ error: 'sala não encontrada' }));
+    }
+    return;
+  }
+
+  // Cadastro de e-mail para updates
+  if (req.method === 'POST' && req.url === '/subscribe') {
+    res.setHeader('Content-Type', 'application/json');
+    let raw = '';
+    for await (const chunk of req) {
+      raw += chunk;
+      if (raw.length > 4000) break; // anti-abuso
+    }
+    try {
+      const body = JSON.parse(raw);
+      const result = addSubscriber(body?.email, typeof body?.source === 'string' ? body.source : 'unknown', body?.name);
+      res.writeHead(result === 'invalid' ? 400 : 200);
+      res.end(JSON.stringify({ result }));
+    } catch {
+      res.writeHead(400);
+      res.end(JSON.stringify({ result: 'invalid' }));
     }
     return;
   }

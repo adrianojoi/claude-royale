@@ -6,7 +6,8 @@ import {
   BALANCE_HISTORY, CARDS, classifyChange, getAttribute, percentChange, setAttribute,
 } from '@claude-royale/shared';
 import { runSimulation } from './simCore';
-import { telemetrySummary } from './telemetry';
+import { recentMatches, telemetrySummary } from './telemetry';
+import { listSubscribers } from './subscribers';
 
 /**
  * API do painel de balanceamento. Protegida por chave simples:
@@ -98,6 +99,10 @@ export async function handleAdminRequest(
       json(res, 200, Object.values(CARDS).filter((c) => !c.hidden));
     } else if (req.method === 'GET' && req.url === '/admin/telemetry') {
       json(res, 200, telemetrySummary());
+    } else if (req.method === 'GET' && req.url === '/admin/subscribers') {
+      json(res, 200, listSubscribers());
+    } else if (req.method === 'GET' && req.url === '/admin/matches') {
+      json(res, 200, recentMatches());
     } else if (req.method === 'GET' && req.url === '/admin/history') {
       json(res, 200, BALANCE_HISTORY);
     } else if (req.method === 'POST' && req.url === '/admin/simulate') {

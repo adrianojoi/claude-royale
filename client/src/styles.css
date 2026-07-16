@@ -948,6 +948,9 @@ body,
   align-items: center;
   gap: 12px;
   box-shadow: 0 18px 44px rgba(0, 0, 0, 0.6);
+  width: min(440px, 92vw);
+  max-height: 92vh;
+  overflow-y: auto;
 }
 
 .overlay-card h2 { font-size: 28px; }
@@ -1035,6 +1038,54 @@ body,
   border-color: var(--gold);
 }
 
+/* Nome no header agora é texto (o plate inteiro abre o Perfil) */
+.home-header .profile-name {
+  display: block;
+  background: none;
+  border: none;
+  width: auto;
+  max-width: 140px;
+  padding: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Contador cosmético "jogando agora" */
+.players-online {
+  align-self: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #9be06a;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(155, 224, 106, 0.35);
+  border-radius: 999px;
+  padding: 4px 14px;
+  letter-spacing: 0.3px;
+}
+
+/* Modal de aviso de desenvolvimento */
+.dev-notice { max-width: 440px; }
+.dev-notice .modal-type.small { font-size: 12.5px; opacity: 0.85; }
+.dev-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin: 6px 0 12px;
+}
+.dev-links a {
+  color: #ffd75e;
+  text-decoration: none;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: rgba(255, 215, 94, 0.1);
+  border: 1px solid rgba(255, 215, 94, 0.3);
+}
+.dev-links a:hover { background: rgba(255, 215, 94, 0.2); }
+.onboarding-error { color: #ef9a9a; font-size: 12.5px; margin: -4px 0 2px; }
+
 .play-buttons {
   display: flex;
   gap: 14px;
@@ -1082,6 +1133,15 @@ body,
 .history-result { flex: 1; text-align: left; }
 .history-row.win .history-result { color: #9ccc65; }
 .history-row.loss .history-result { color: #ef9a9a; }
+
+/* Seletor de idioma (Configurações) */
+.lang-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.lang-label { font-weight: 700; opacity: 0.85; }
 
 /* ===== Overtime (morte súbita) ===== */
 .battle-root.overtime::after {
@@ -1277,9 +1337,35 @@ body,
 
 .result-actions {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
   justify-content: center;
+  width: 100%;
+}
+
+/* Botões do resultado: mesmo estilo e altura, alinhados */
+.result-button {
+  flex: 1 1 auto;
+  min-width: 150px;
+  min-height: 52px;
+  padding: 12px 20px;
+  border: 2px solid rgba(240, 181, 60, 0.55);
+  border-radius: 14px;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 17px;
+  color: #fff3d6;
+  background: linear-gradient(180deg, rgba(52, 42, 78, 0.95), rgba(30, 24, 48, 0.95));
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+  transition: transform 120ms ease, filter 120ms ease, border-color 120ms ease;
+}
+.result-button:hover { transform: translateY(-2px); border-color: var(--gold); filter: brightness(1.1); }
+.result-button:active { transform: translateY(1px); }
+.result-button.primary {
+  background: linear-gradient(180deg, #f0b53c, #d38c1a);
+  color: #2a1c00;
+  border-color: #ffe29a;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
 /* ===== Modos de jogo (aba Batalha) ===== */
@@ -2032,7 +2118,13 @@ body { font-family: var(--font-body); }
   border: 2px solid rgba(240, 181, 60, 0.65);
   border-radius: 14px;
   padding: 5px 14px 5px 8px;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  transition: border-color 140ms ease, transform 140ms ease;
 }
+.home-header .profile-plate:hover { border-color: var(--gold); transform: translateY(-1px); }
 
 .header-emblem {
   display: grid;
@@ -2130,12 +2222,15 @@ body { font-family: var(--font-body); }
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  padding: 36px 26px 24px;
+  padding: 42px 26px 30px;
   background:
     url('/assets/ui/panel-large.png') center / 100% 100% no-repeat,
     linear-gradient(180deg, rgba(22, 18, 36, 0.88), rgba(10, 8, 18, 0.92));
   border-radius: 8px;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+  /* Não estica com a altura da tela: mantém a moldura proporcional e rola o conteúdo. */
+  align-self: start;
+  max-height: 100%;
   min-height: 0;
   overflow: hidden;
 }
@@ -2168,6 +2263,7 @@ body { font-family: var(--font-body); }
   flex-direction: column;
   gap: 5px;
   margin-top: 4px;
+  padding: 3px 2px;
   overflow-y: auto;
 }
 
@@ -2275,9 +2371,13 @@ body { font-family: var(--font-body); }
 .battle-cta {
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
   min-width: min(360px, 80vw);
   min-height: 76px;
-  padding: 16px 56px 16px 98px;
+  padding: 16px 48px;
   border: none;
   border-radius: 34px;
   cursor: pointer;
@@ -2288,10 +2388,9 @@ body { font-family: var(--font-body); }
   color: #fff3d6;
   text-shadow: 0 3px 5px rgba(0, 0, 0, 0.85);
   background:
-    url('/assets/ui/icon-swords.png') 34px center / 48px no-repeat,
     url('/assets/ui/btn-primary-frame.png') center / 100% 100% no-repeat,
     linear-gradient(180deg, rgba(52, 40, 16, 0.55), rgba(30, 22, 8, 0.55));
-  background-clip: border-box, border-box, padding-box;
+  background-clip: border-box, padding-box;
   filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.65));
   transition: transform 130ms ease, filter 130ms ease;
 }
@@ -2402,8 +2501,10 @@ body { font-family: var(--font-body); }
 
 @media (max-width: 760px) {
   .home-header { flex-wrap: wrap; }
-  .battle-cta { padding-left: 84px; min-height: 70px; }
+  .battle-cta { min-height: 70px; }
 }
+
+.battle-cta-icon { width: 40px; height: 40px; object-fit: contain; flex: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .dash-panel.slide-left, .dash-panel.slide-right, .dash-center, .deck-strip { animation: none; }

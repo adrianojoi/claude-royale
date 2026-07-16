@@ -1,32 +1,31 @@
 import { useMemo, useState } from 'react';
 import { DEFAULT_DECK, collectionCards, getCard } from '@claude-royale/shared';
 import { CardArt } from './CardArt';
+import { useI18n, cardName } from '../i18n';
 
 interface DeckScreenProps {
   deck: string[];
   onDeckChange: (deck: string[]) => void;
 }
 
-/** Arquétipos prontos para quem está começando. */
-const SUGGESTED_DECKS: Array<{ name: string; description: string; deck: string[] }> = [
+/** Arquétipos prontos (nome/descrição via i18n). */
+const SUGGESTED_DECKS: Array<{ nameKey: string; descKey: string; deck: string[] }> = [
   {
-    name: '🔄 Ciclo Rápido',
-    description: 'Cartas baratas, pressão constante com Javali',
+    nameKey: 'deckScreen.cycleName', descKey: 'deckScreen.cycleDesc',
     deck: ['javali', 'esqueletos', 'salteadores', 'lanceiros', 'choque', 'flechas', 'canhao', 'morcegos'],
   },
   {
-    name: '🐘 Beatdown',
-    description: 'Tanque na frente, suporte atrás, push gigante',
+    nameKey: 'deckScreen.beatdownName', descKey: 'deckScreen.beatdownDesc',
     deck: ['golem', 'bruxa', 'mago', 'dragaozinho', 'furia', 'bolaDeFogo', 'curandeira', 'pocoDeElixir'],
   },
   {
-    name: '🏰 Controle',
-    description: 'Defenda com construções e vença no contra-ataque',
+    nameKey: 'deckScreen.controlName', descKey: 'deckScreen.controlDesc',
     deck: ['balestra', 'bobina', 'torreBombas', 'executor', 'congelamento', 'foguete', 'arqueiras', 'guardiaoRunico'],
   },
 ];
 
 export function DeckScreen({ deck, onDeckChange }: DeckScreenProps) {
+  const { t } = useI18n();
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
 
   const avgCost = useMemo(() => {
@@ -51,12 +50,12 @@ export function DeckScreen({ deck, onDeckChange }: DeckScreenProps) {
   return (
     <div className="deck-screen">
       <div className="deck-header">
-        <h2 className="screen-title">Seu deck</h2>
+        <h2 className="screen-title">{t('deckScreen.title')}</h2>
         <span className="avg-cost">
-          💧 Custo médio: <strong>{avgCost}</strong>
+          {t('deckScreen.avgCost')} <strong>{avgCost}</strong>
         </span>
         <button className="text-button" onClick={() => onDeckChange([...DEFAULT_DECK])}>
-          Restaurar padrão
+          {t('deckScreen.restore')}
         </button>
       </div>
 
@@ -73,7 +72,7 @@ export function DeckScreen({ deck, onDeckChange }: DeckScreenProps) {
             >
               <span className="card-cost">{card.cost}</span>
               <CardArt cardId={cardId} color="blue" emoji={card.emoji} />
-              <span className="grid-card-name">{card.name}</span>
+              <span className="grid-card-name">{cardName(cardId)}</span>
             </button>
           );
         })}
@@ -82,20 +81,18 @@ export function DeckScreen({ deck, onDeckChange }: DeckScreenProps) {
       <div className="mode-row">
         {SUGGESTED_DECKS.map((suggestion) => (
           <button
-            key={suggestion.name}
+            key={suggestion.nameKey}
             className="text-button"
-            title={suggestion.description}
+            title={t(suggestion.descKey)}
             onClick={() => onDeckChange([...suggestion.deck])}
           >
-            {suggestion.name}
+            {t(suggestion.nameKey)}
           </button>
         ))}
       </div>
 
       <p className="deck-hint">
-        {selectedSlot === null
-          ? 'Toque numa carta do deck para trocá-la — ou use um arquétipo pronto acima'
-          : 'Agora escolha a carta substituta 👇'}
+        {selectedSlot === null ? t('deckScreen.hintSwap') : t('deckScreen.hintPick')}
       </p>
 
       <div className={`card-grid trade-grid ${selectedSlot === null ? 'dimmed' : ''}`}>
@@ -109,10 +106,10 @@ export function DeckScreen({ deck, onDeckChange }: DeckScreenProps) {
           >
             <span className="card-cost">{card.cost}</span>
             <CardArt cardId={card.id} color="blue" emoji={card.emoji} />
-            <span className="grid-card-name">{card.name}</span>
+            <span className="grid-card-name">{cardName(card.id)}</span>
           </button>
         ))}
-        {available.length === 0 && <p className="deck-hint">Todas as cartas já estão no deck</p>}
+        {available.length === 0 && <p className="deck-hint">{t('deckScreen.allInDeck')}</p>}
       </div>
     </div>
   );

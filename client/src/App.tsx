@@ -27,6 +27,7 @@ import {
 import { ARENAS, currentArena, evaluateAchievements } from './ui/achievements';
 import { isArenaTheme, type ArenaTheme } from './game/arena';
 import { ambient } from './game/ambient';
+import { t } from './i18n';
 
 function loadTheme(): ArenaTheme {
   try {
@@ -67,7 +68,7 @@ export function App() {
       const rollover = applySeasonRollover(current, Math.max(0, arenaIndex));
       if (!rollover) return current;
       if (rollover.reward > 0) {
-        setToast(`🗓️ Nova temporada! Recompensa: 💰${rollover.reward} · troféus ajustados`);
+        setToast(t('app.newSeason', { reward: rollover.reward }));
         setTimeout(() => setToast(''), 4000);
       }
       return rollover.profile;
@@ -82,6 +83,7 @@ export function App() {
   const musicRef = useRef<HTMLAudioElement | null>(null);
   const endedRef = useRef(false);
   const vsBotRef = useRef(false);
+  const lastPlayOptsRef = useRef<Omit<JoinBattleOptions, 'deck' | 'name'>>({});
   const recorderRef = useRef<ReplayRecorder | null>(null);
 
   // Música de fundo; jingle + registro de partida no fim.
@@ -109,7 +111,7 @@ export function App() {
         const unlocked = evaluateAchievements(next, record);
         if (unlocked.length > 0) {
           saveProfile(next);
-          setToast(`🏅 Conquista: ${unlocked.map((a) => `${a.emoji} ${a.name}`).join(' · ')}`);
+          setToast(t('app.achievement', { list: unlocked.map((a) => `${a.emoji} ${t(`ach.${a.id}.name`)}`).join(' · ') }));
           setTimeout(() => setToast(''), 3500);
         }
         return next;
@@ -252,6 +254,7 @@ export function App() {
       setScreen('connecting');
       vsBotRef.current = opts.vsBot === true || opts.botMatch === true;
       botDifficultyRef.current = opts.vsBot ? opts.botDifficulty : undefined;
+      lastPlayOptsRef.current = opts;
       abilityUsedRef.current = false;
       await enterLandscapeFullscreen();
       try {
@@ -261,7 +264,7 @@ export function App() {
         setupRoom(room, opts.botMatch === true); // bot vs bot: você é espectador
       } catch (err) {
         console.error('Falha ao conectar no servidor', err);
-        setToast('Não foi possível conectar ao servidor. Ele está rodando?');
+        setToast(t('app.connectFail'));
         setTimeout(() => setToast(''), 3200);
         setScreen('menu');
       }
@@ -277,7 +280,7 @@ export function App() {
         const room = await spectateBattle(code);
         setupRoom(room, true);
       } catch {
-        setToast('Sala não encontrada — confira o código');
+        setToast(t('app.roomNotFound'));
         setTimeout(() => setToast(''), 2600);
         setScreen('menu');
       }
@@ -447,6 +450,10 @@ export function App() {
               setScreen('replay');
             }}
             onExit={leaveToMenu}
+            onRematch={() => {
+              leaveToMenu();
+              void handlePlay(lastPlayOptsRef.current);
+            }}
           />
         </>
       )}

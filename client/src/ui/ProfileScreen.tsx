@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ACHIEVEMENTS, ARENAS, currentArena, nextArena } from './achievements';
 import { loadSettings, saveSettings } from './settings';
+import { useI18n, LOCALES } from '../i18n';
 import type { Profile } from './profileStorage';
 
 interface ProfileScreenProps {
@@ -10,6 +11,7 @@ interface ProfileScreenProps {
 
 /** Aba Perfil: identidade, caminho dos troféus, estatísticas, conquistas e histórico. */
 export function ProfileScreen({ profile, onNameChange }: ProfileScreenProps) {
+  const { t } = useI18n();
   const arena = currentArena(profile.trophies);
   const next = nextArena(profile.trophies);
   const winrate =
@@ -20,7 +22,7 @@ export function ProfileScreen({ profile, onNameChange }: ProfileScreenProps) {
 
   return (
     <div className="profile-screen">
-      <h2 className="screen-title">Perfil</h2>
+      <h2 className="screen-title">{t('profile.title')}</h2>
 
       <div className="profile-card">
         <div className="profile-avatar">{arena.emoji}</div>
@@ -30,15 +32,15 @@ export function ProfileScreen({ profile, onNameChange }: ProfileScreenProps) {
             value={profile.name}
             maxLength={16}
             onChange={(e) => onNameChange(e.target.value)}
-            aria-label="Nome do jogador"
+            aria-label={t('home.playerName')}
           />
           <p className="profile-arena">
-            {arena.emoji} {arena.name} · 🏆 {profile.trophies} · 💰 {profile.gold}
+            {arena.emoji} {t(`arenas.${arena.id}`)} · 🏆 {profile.trophies} · 💰 {profile.gold}
           </p>
         </div>
       </div>
 
-      <h3 className="section-title">🛤️ Caminho dos Troféus</h3>
+      <h3 className="section-title">{t('profile.trophyRoad')}</h3>
       <div className="trophy-road">
         {ARENAS.map((step) => {
           const reached = profile.trophies >= step.minTrophies;
@@ -49,7 +51,7 @@ export function ProfileScreen({ profile, onNameChange }: ProfileScreenProps) {
               className={`road-step ${reached ? 'reached' : ''} ${isCurrent ? 'current' : ''}`}
             >
               <span className="road-emoji">{step.emoji}</span>
-              <span className="road-name">{step.name}</span>
+              <span className="road-name">{t(`arenas.${step.id}`)}</span>
               <span className="road-trophies">🏆 {step.minTrophies}</span>
             </div>
           );
@@ -57,23 +59,22 @@ export function ProfileScreen({ profile, onNameChange }: ProfileScreenProps) {
       </div>
       {next && (
         <p className="deck-hint">
-          Faltam <strong>{next.minTrophies - profile.trophies}</strong> troféus para{' '}
-          {next.emoji} {next.name}
+          {t('profile.toNext', { n: next.minTrophies - profile.trophies, emoji: next.emoji, name: t(`arenas.${next.id}`) })}
         </p>
       )}
 
-      <h3 className="section-title">📊 Estatísticas</h3>
+      <h3 className="section-title">{t('profile.stats')}</h3>
       <div className="stats-grid">
-        <Stat label="Partidas" value={profile.stats.matches} />
-        <Stat label="Vitórias" value={profile.stats.wins} />
-        <Stat label="Derrotas" value={profile.stats.losses} />
-        <Stat label="Empates" value={profile.stats.draws} />
-        <Stat label="Winrate" value={`${winrate}%`} />
-        <Stat label="Coroas" value={profile.stats.crowns} />
+        <Stat label={t('profile.matches')} value={profile.stats.matches} />
+        <Stat label={t('profile.wins')} value={profile.stats.wins} />
+        <Stat label={t('profile.losses')} value={profile.stats.losses} />
+        <Stat label={t('profile.draws')} value={profile.stats.draws} />
+        <Stat label={t('profile.winrate')} value={`${winrate}%`} />
+        <Stat label={t('profile.crowns')} value={profile.stats.crowns} />
       </div>
 
       <h3 className="section-title">
-        🏅 Conquistas ({unlockedCount}/{ACHIEVEMENTS.length})
+        {t('profile.achievements', { n: unlockedCount, total: ACHIEVEMENTS.length })}
       </h3>
       <div className="achievements-grid">
         {ACHIEVEMENTS.map((achievement) => {
@@ -82,11 +83,11 @@ export function ProfileScreen({ profile, onNameChange }: ProfileScreenProps) {
             <div
               key={achievement.id}
               className={`achievement ${unlockedAt ? 'unlocked' : 'locked'}`}
-              title={achievement.description}
+              title={t(`ach.${achievement.id}.desc`)}
             >
               <span className="achievement-emoji">{unlockedAt ? achievement.emoji : '🔒'}</span>
-              <span className="achievement-name">{achievement.name}</span>
-              <span className="achievement-desc">{achievement.description}</span>
+              <span className="achievement-name">{t(`ach.${achievement.id}.name`)}</span>
+              <span className="achievement-desc">{t(`ach.${achievement.id}.desc`)}</span>
               {unlockedAt && (
                 <span className="achievement-date">{unlockedAt.slice(0, 10)}</span>
               )}
@@ -99,18 +100,18 @@ export function ProfileScreen({ profile, onNameChange }: ProfileScreenProps) {
 
       {profile.history.length > 0 && (
         <>
-          <h3 className="section-title">🕘 Últimas partidas</h3>
+          <h3 className="section-title">{t('profile.recent')}</h3>
           <div className="match-history full">
             <ul>
               {profile.history.map((match, i) => (
                 <li key={i} className={`history-row ${match.result}`}>
                   <span className="history-result">
-                    {match.result === 'win' ? '✅ Vitória' : match.result === 'loss' ? '❌ Derrota' : '🤝 Empate'}
+                    {match.result === 'win' ? `✅ ${t('common.win')}` : match.result === 'loss' ? `❌ ${t('common.loss')}` : `🤝 ${t('common.draw')}`}
                   </span>
                   <span className="history-score">
                     {match.myCrowns} 👑 {match.oppCrowns}
                   </span>
-                  <span className="history-mode">{match.vsBot ? '🤖 bot' : '⚔️ 1v1'}</span>
+                  <span className="history-mode">{match.vsBot ? t('profile.bot') : t('profile.pvp')}</span>
                 </li>
               ))}
             </ul>
@@ -123,6 +124,7 @@ export function ProfileScreen({ profile, onNameChange }: ProfileScreenProps) {
 
 /** Acessibilidade e conforto. */
 function SettingsPanel() {
+  const { t, locale, setLocale } = useI18n();
   const [settings, setSettings] = useState(loadSettings);
   const update = (patch: Partial<ReturnType<typeof loadSettings>>) => {
     const next = { ...settings, ...patch };
@@ -131,15 +133,27 @@ function SettingsPanel() {
   };
   return (
     <>
-      <h3 className="section-title">⚙️ Configurações</h3>
+      <h3 className="section-title">{t('settings.title')}</h3>
       <div className="mode-row settings-row">
+        <div className="lang-picker" role="radiogroup" aria-label={t('settings.language')}>
+          <span className="lang-label">{t('settings.language')}</span>
+          {LOCALES.map((l) => (
+            <button
+              key={l.id}
+              className={`difficulty-option ${locale === l.id ? 'active' : ''}`}
+              onClick={() => setLocale(l.id)}
+            >
+              {l.flag} {l.label}
+            </button>
+          ))}
+        </div>
         <label className={`party-toggle ${settings.reduceEffects ? 'on' : ''}`}>
           <input
             type="checkbox"
             checked={settings.reduceEffects}
             onChange={(e) => update({ reduceEffects: e.target.checked })}
           />
-          🍃 Reduzir efeitos (clima/luzes)
+          {t('settings.reduceEffects')}
         </label>
         <label className={`party-toggle ${settings.colorblind ? 'on' : ''}`}>
           <input
@@ -147,7 +161,7 @@ function SettingsPanel() {
             checked={settings.colorblind}
             onChange={(e) => update({ colorblind: e.target.checked })}
           />
-          👁️ Marcadores de time (●/▲)
+          {t('settings.teamMarkers')}
         </label>
         <div className="difficulty-picker">
           {[1, 1.15, 1.3].map((scale) => (
@@ -161,7 +175,7 @@ function SettingsPanel() {
           ))}
         </div>
       </div>
-      <p className="deck-hint">As opções valem a partir da próxima batalha.</p>
+      <p className="deck-hint">{t('settings.applyNextBattle')}</p>
     </>
   );
 }

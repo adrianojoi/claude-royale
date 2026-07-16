@@ -125,6 +125,40 @@ export function snapshotHud(room: Room): HudSnapshot {
   };
 }
 
+/** Cadastra um e-mail para updates. Retorna 'ok' | 'exists' | 'invalid' | 'error'. */
+export async function subscribeEmail(
+  email: string,
+  source: string,
+  name?: string,
+  wantsUpdates = true,
+): Promise<'ok' | 'exists' | 'invalid' | 'error'> {
+  try {
+    const res = await fetch(`${serverHttpUrl()}/subscribe`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, source, name, wantsUpdates }),
+    });
+    const data = await res.json().catch(() => ({}));
+    return (data.result as 'ok' | 'exists' | 'invalid') ?? 'error';
+  } catch {
+    return 'error';
+  }
+}
+
+/** Admin: lista de e-mails cadastrados (requer chave). */
+export async function fetchSubscribers(adminKey: string): Promise<Array<Record<string, unknown>>> {
+  const res = await fetch(`${serverHttpUrl()}/admin/subscribers`, { headers: { 'x-admin-key': adminKey } });
+  if (!res.ok) throw new Error(String(res.status));
+  return res.json();
+}
+
+/** Admin: telemetria das últimas partidas (requer chave). */
+export async function fetchMatches(adminKey: string): Promise<Array<Record<string, unknown>>> {
+  const res = await fetch(`${serverHttpUrl()}/admin/matches`, { headers: { 'x-admin-key': adminKey } });
+  if (!res.ok) throw new Error(String(res.status));
+  return res.json();
+}
+
 export function sendPlayCard(room: Room, cardId: string, x: number, y: number): void {
   room.send('playCard', { cardId, x, y });
 }

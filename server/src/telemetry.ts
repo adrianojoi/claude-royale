@@ -36,6 +36,21 @@ export interface CardTelemetry {
   decks: number;
 }
 
+/** Últimas partidas registradas (cru, mais recentes primeiro). */
+export function recentMatches(limit = 200): MatchLog[] {
+  try {
+    if (!existsSync(DATA_PATH)) return [];
+    const rows = readFileSync(DATA_PATH, 'utf8')
+      .split('\n')
+      .filter((l) => l.trim())
+      .map((l) => { try { return JSON.parse(l) as MatchLog; } catch { return null; } })
+      .filter((m): m is MatchLog => m !== null);
+    return rows.reverse().slice(0, limit);
+  } catch {
+    return [];
+  }
+}
+
 export function telemetrySummary(): {
   matches: number;
   cards: Record<string, CardTelemetry>;

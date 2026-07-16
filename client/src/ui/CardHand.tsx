@@ -5,6 +5,7 @@ import {
   VIEW_H, VIEW_W, getCard, screenToGrid,
 } from '@claude-royale/shared';
 import { sendPlayCard } from '../net/connection';
+import { useI18n } from '../i18n';
 import { bus } from '../game/bus';
 import { sideColor, type SideColor } from '../game/assets';
 import { CardArt } from './CardArt';
@@ -39,6 +40,7 @@ function uiSound(rate: number, volume: number): void {
 }
 
 export function CardHand({ hand, nextCard, elixir, disabled, room, mySide }: CardHandProps) {
+  const { t } = useI18n();
   const myColor = sideColor(mySide);
   const [drag, setDrag] = useState<DragState | null>(null);
   const dragRef = useRef<DragState | null>(null);
@@ -103,7 +105,7 @@ export function CardHand({ hand, nextCard, elixir, disabled, room, mySide }: Car
     <>
       <div className="card-hand">
         <div className="next-card">
-          <span className="next-label">Próxima</span>
+          <span className="next-label">{t('battle.nextCard')}</span>
           <MiniCard cardId={nextCard} color={myColor} />
         </div>
         {hand.map((cardId, i) => {

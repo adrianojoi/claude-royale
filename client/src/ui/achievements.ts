@@ -9,55 +9,56 @@ export interface AchievementDef {
   check: (profile: Profile, record: MatchRecord) => boolean;
 }
 
+// Nome/descrição são padrão (inglês); a UI traduz por id via i18n (ach.<id>).
 export const ACHIEVEMENTS: AchievementDef[] = [
   {
-    id: 'primeira-vitoria', name: 'Primeira Vitória', emoji: '🎉',
-    description: 'Vença sua primeira partida.',
+    id: 'primeira-vitoria', name: 'First Win', emoji: '🎉',
+    description: 'Win your first match.',
     check: (p) => p.stats.wins >= 1,
   },
   {
-    id: 'veterano', name: 'Veterano', emoji: '🎖️',
-    description: 'Vença 10 partidas.',
+    id: 'veterano', name: 'Veteran', emoji: '🎖️',
+    description: 'Win 10 matches.',
     check: (p) => p.stats.wins >= 10,
   },
   {
-    id: 'maratonista', name: 'Maratonista', emoji: '🏃',
-    description: 'Jogue 20 partidas.',
+    id: 'maratonista', name: 'Marathoner', emoji: '🏃',
+    description: 'Play 20 matches.',
     check: (p) => p.stats.matches >= 20,
   },
   {
-    id: 'colecionador-de-coroas', name: 'Colecionador de Coroas', emoji: '👑',
-    description: 'Acumule 25 coroas.',
+    id: 'colecionador-de-coroas', name: 'Crown Collector', emoji: '👑',
+    description: 'Collect 25 crowns.',
     check: (p) => p.stats.crowns >= 25,
   },
   {
-    id: 'vitoria-perfeita', name: 'Vitória Perfeita', emoji: '💎',
-    description: 'Vença uma partida com 3 coroas.',
+    id: 'vitoria-perfeita', name: 'Flawless Victory', emoji: '💎',
+    description: 'Win a match with 3 crowns.',
     check: (_, r) => r.result === 'win' && r.myCrowns >= 3,
   },
   {
-    id: 'muralha', name: 'Muralha', emoji: '🧱',
-    description: 'Vença sem perder nenhuma torre.',
+    id: 'muralha', name: 'Ironwall', emoji: '🧱',
+    description: 'Win without losing a tower.',
     check: (_, r) => r.result === 'win' && r.oppCrowns === 0,
   },
   {
-    id: 'domador-de-maquinas', name: 'Domador de Máquinas', emoji: '🤖',
-    description: 'Vença o bot no modo Difícil.',
+    id: 'domador-de-maquinas', name: 'Machine Tamer', emoji: '🤖',
+    description: 'Beat the bot on Hard.',
     check: (_, r) => r.result === 'win' && r.vsBot && r.botDifficulty === 'hard',
   },
   {
-    id: 'toque-de-mestre', name: 'Toque de Mestre', emoji: '✨',
-    description: 'Use a habilidade de um campeão numa partida.',
+    id: 'toque-de-mestre', name: "Master's Touch", emoji: '✨',
+    description: 'Use a champion ability in a match.',
     check: (_, r) => r.usedAbility === true,
   },
   {
-    id: 'ascensao', name: 'Ascensão', emoji: '📈',
-    description: 'Alcance 100 troféus.',
+    id: 'ascensao', name: 'Ascension', emoji: '📈',
+    description: 'Reach 100 trophies.',
     check: (p) => p.trophies >= 100,
   },
   {
-    id: 'lenda-da-arena', name: 'Lenda da Arena', emoji: '🌟',
-    description: 'Alcance 500 troféus.',
+    id: 'lenda-da-arena', name: 'Arena Legend', emoji: '🌟',
+    description: 'Reach 500 trophies.',
     check: (p) => p.trophies >= 500,
   },
 ];
@@ -75,20 +76,21 @@ export function evaluateAchievements(profile: Profile, record: MatchRecord): Ach
   return unlocked;
 }
 
-/** Caminho dos Troféus: arenas por faixa. */
+/** Caminho dos Troféus: arenas por faixa. Nome é padrão (inglês); UI traduz por id. */
 export interface Arena {
+  id: string;
   name: string;
   emoji: string;
   minTrophies: number;
 }
 
 export const ARENAS: Arena[] = [
-  { name: 'Clareira dos Novatos', emoji: '🌱', minTrophies: 0 },
-  { name: 'Ponte de Pedra', emoji: '🌉', minTrophies: 100 },
-  { name: 'Dunas Escaldantes', emoji: '🏜️', minTrophies: 200 },
-  { name: 'Picos Nevados', emoji: '🏔️', minTrophies: 300 },
-  { name: 'Vale Noturno', emoji: '🌙', minTrophies: 450 },
-  { name: 'Coliseu Real', emoji: '🏟️', minTrophies: 600 },
+  { id: 'glade', name: 'Rookie Glade', emoji: '🌱', minTrophies: 0 },
+  { id: 'bridge', name: 'Stone Bridge', emoji: '🌉', minTrophies: 100 },
+  { id: 'dunes', name: 'Scorching Dunes', emoji: '🏜️', minTrophies: 200 },
+  { id: 'peaks', name: 'Snowy Peaks', emoji: '🏔️', minTrophies: 300 },
+  { id: 'vale', name: 'Nightfall Vale', emoji: '🌙', minTrophies: 450 },
+  { id: 'colosseum', name: 'Royal Colosseum', emoji: '🏟️', minTrophies: 600 },
 ];
 
 export function currentArena(trophies: number): Arena {
